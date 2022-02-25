@@ -1,6 +1,7 @@
 package io.legacyfighter.cabs.integration;
 
 import io.legacyfighter.cabs.common.Fixtures;
+import io.legacyfighter.cabs.common.TestWithGraphDB;
 import io.legacyfighter.cabs.dto.AddressDTO;
 import io.legacyfighter.cabs.dto.AnalyzedAddressesDTO;
 import io.legacyfighter.cabs.entity.Address;
@@ -11,7 +12,6 @@ import io.legacyfighter.cabs.ui.TransitAnalyzerController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Clock;
@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 import static io.legacyfighter.cabs.entity.CarType.CarClass.VAN;
 import static java.time.LocalDateTime.of;
 import static java.time.ZoneOffset.UTC;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-public class AnalyzeNearbyTransitsIntegrationTest {
+public class AnalyzeNearbyTransitsIntegrationTest extends TestWithGraphDB {
 
     @Autowired
     Fixtures fixtures;
@@ -79,8 +79,7 @@ public class AnalyzeNearbyTransitsIntegrationTest {
 
         //then
         // 1-2-5-4-5
-        org.assertj.core.api.Assertions
-                .assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
+        assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
                 .containsExactly(address1.getHash(), address2.getHash(), address5.getHash(), address4.getHash(), address5.getHash());
     }
 
@@ -122,8 +121,7 @@ public class AnalyzeNearbyTransitsIntegrationTest {
 
         //then
         // 1-2-3-4
-        org.assertj.core.api.Assertions
-                .assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
+        assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
                 .containsExactly(address1.getHash(), address2.getHash(), address3.getHash(), address4.getHash());
     }
 
@@ -153,8 +151,7 @@ public class AnalyzeNearbyTransitsIntegrationTest {
 
         //then
         // 1-2-3-4
-        org.assertj.core.api.Assertions
-                .assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
+        assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
                 .containsExactly(address1.getHash(), address2.getHash(), address3.getHash(), address4.getHash());
     }
 
@@ -193,15 +190,12 @@ public class AnalyzeNearbyTransitsIntegrationTest {
 
         //then
         // 5-1-2-3
-        org.assertj.core.api.Assertions
-                .assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
+        assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
                 .containsExactly(address5.getHash(), address1.getHash(), address2.getHash(), address3.getHash());
     }
 
     @Test
-    // pytanie za 100 punktów, czy ten test będzie działał na grafie, bo tam jest warunek na ścieżkę o długości przynajmniej 1...
-    void canFindLongTravelBetweenOthers()
-    {
+    void canFindLongTravelBetweenOthers() {
         //given
         Client client = fixtures.aClient();
         //and
@@ -224,9 +218,8 @@ public class AnalyzeNearbyTransitsIntegrationTest {
         AnalyzedAddressesDTO analyzedAddressesDTO = transitAnalyzerController.analyze(client.getId(), address1.getId());
 
         //then
-        //1-2
-        org.assertj.core.api.Assertions
-                .assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
+        //1-2-3
+        assertThat(analyzedAddressesDTO.getAddresses().stream().map(AddressDTO::getHash).collect(Collectors.toList()))
                 .containsExactly(address1.getHash(), address2.getHash(), address3.getHash());
     }
 
